@@ -1,92 +1,93 @@
 <template>
-    <jet-authentication-card>
-        <template #logo>
-            <jet-authentication-card-logo />
-        </template>
+  <div class="card-body">
 
-        <jet-validation-errors class="mb-4" />
+    <breeze-validation-errors class="mb-3" />
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-            {{ status }}
+    <div v-if="status" class="alert alert-success mb-3 rounded-0" role="alert">
+      {{ status }}
+    </div>
+
+    <form @submit.prevent="submit">
+      <div class="form-group">
+        <breeze-label for="email" value="Email" />
+        <breeze-input id="email" type="email" v-model="form.email" required autofocus />
+      </div>
+
+      <div class="form-group">
+        <breeze-label for="password" value="Password" />
+        <breeze-input id="password" type="password" v-model="form.password" required autocomplete="current-password" />
+      </div>
+
+      <div class="form-group">
+        <div class="custom-control custom-checkbox">
+          <breeze-checkbox id="remember_me" name="remember" v-model:checked="form.remember" />
+
+          <label class="custom-control-label" for="remember_me">
+            Remember Me
+          </label>
         </div>
+      </div>
 
-        <form @submit.prevent="submit">
-            <div>
-                <jet-label for="email" value="Email" />
-                <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus />
-            </div>
+      <div class="mb-0">
+        <div class="d-flex justify-content-end align-items-baseline">
+          <inertia-link v-if="canResetPassword" :href="route('password.request')" class="text-muted mr-3">
+            Forgot your password?
+          </inertia-link>
 
-            <div class="mt-4">
-                <jet-label for="password" value="Password" />
-                <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="current-password" />
-            </div>
-
-            <div class="block mt-4">
-                <label class="flex items-center">
-                    <jet-checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <inertia-link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Forgot your password?
-                </inertia-link>
-
-                <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
-                </jet-button>
-            </div>
-        </form>
-    </jet-authentication-card>
+          <breeze-button class="ml-4" :class="{ 'text-white-50': form.processing }" :disabled="form.processing">
+            Log in
+          </breeze-button>
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script>
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo'
-    import JetButton from '@/Jetstream/Button'
-    import JetInput from '@/Jetstream/Input'
-    import JetCheckbox from '@/Jetstream/Checkbox'
-    import JetLabel from '@/Jetstream/Label'
-    import JetValidationErrors from '@/Jetstream/ValidationErrors'
+import BreezeButton from '@/Components/Button'
+import BreezeGuestLayout from "@/Layouts/Guest"
+import BreezeInput from '@/Components/Input'
+import BreezeCheckbox from '@/Components/Checkbox'
+import BreezeLabel from '@/Components/Label'
+import BreezeValidationErrors from '@/Components/ValidationErrors'
 
-    export default {
-        components: {
-            JetAuthenticationCard,
-            JetAuthenticationCardLogo,
-            JetButton,
-            JetInput,
-            JetCheckbox,
-            JetLabel,
-            JetValidationErrors
-        },
+export default {
+  layout: BreezeGuestLayout,
 
-        props: {
-            canResetPassword: Boolean,
-            status: String
-        },
+  components: {
+    BreezeButton,
+    BreezeInput,
+    BreezeCheckbox,
+    BreezeLabel,
+    BreezeValidationErrors
+  },
 
-        data() {
-            return {
-                form: this.$inertia.form({
-                    email: '',
-                    password: '',
-                    remember: false
-                })
-            }
-        },
+  props: {
+    canResetPassword: Boolean,
+    status: String
+  },
 
-        methods: {
-            submit() {
-                this.form
-                    .transform(data => ({
-                        ... data,
-                        remember: this.form.remember ? 'on' : ''
-                    }))
-                    .post(this.route('login'), {
-                        onFinish: () => this.form.reset('password'),
-                    })
-            }
-        }
+  data() {
+    return {
+      form: this.$inertia.form({
+        email: '',
+        password: '',
+        remember: false
+      })
     }
+  },
+
+  methods: {
+    submit() {
+      this.form
+          .transform(data => ({
+            ... data,
+            remember: this.form.remember ? 'on' : ''
+          }))
+          .post(this.route('login'), {
+            onFinish: () => this.form.reset('password'),
+          })
+    }
+  }
+}
 </script>
